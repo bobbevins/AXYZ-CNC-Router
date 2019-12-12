@@ -1,0 +1,83 @@
+# Include your custom HAL commands here
+# This file will not be overwritten when you run PNCconf again
+
+
+
+
+#*****************************************
+
+
+#*****************************************
+#   JOG Velocity Mode
+#*****************************************
+
+setp axis.x.jog-vel-mode 0
+setp axis.y.jog-vel-mode 0
+setp axis.z.jog-vel-mode 0
+
+#*****************************************
+
+#*****************************************
+#   Jog Scale
+#*****************************************
+
+setp mux4.0.in0 0.001
+setp mux4.0.in1 0.010
+setp mux4.0.in2 0.1
+
+
+#*****************************************
+
+#********************************************
+#   Inputs to mux component, scale and counts
+#********************************************
+
+net scale1 mux4.0.sel0 <= hm2_7i92.0.7i76.0.0.input-26
+net scale2 mux4.0.sel1 <= hm2_7i92.0.7i76.0.0.input-27
+
+
+net pend-scale axis.x.jog-scale <= mux4.0.out
+net pend-scale axis.y.jog-scale
+net pend-scale axis.z.jog-scale
+
+net mpg-x axis.x.jog-enable <= hm2_7i92.0.7i76.0.0.input-28
+net mpg-y axis.y.jog-enable <= hm2_7i92.0.7i76.0.0.input-29
+net mpg-z axis.z.jog-enable <= hm2_7i92.0.7i76.0.0.input-30
+
+net joint-select-count <= hm2_7i92.0.7i76.0.0.enc0.count
+
+net joint-select-count axis.x.jog-counts
+net joint-select-count axis.y.jog-counts
+net joint-select-count axis.z.jog-counts
+
+
+
+
+
+#*****************************************
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
