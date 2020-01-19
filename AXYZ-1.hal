@@ -10,17 +10,14 @@ loadrt hm2_eth board_ip="192.168.1.121" config=" num_encoders=1 num_pwmgens=0 nu
 setp    hm2_7i92.0.watchdog.timeout_ns 5000000
 loadrt pid names=pid.x,pid.x2,pid.y,pid.z,pid.s
 
-
 loadrt mux4 count=3
-
-
 
 
 addf hm2_7i92.0.read          servo-thread
 addf motion-command-handler   servo-thread
 addf motion-controller        servo-thread
 addf pid.x.do-pid-calcs       servo-thread
-addf pid.x2.do-pid-calcs       servo-thread
+addf pid.x2.do-pid-calcs      servo-thread
 addf pid.y.do-pid-calcs       servo-thread
 addf pid.z.do-pid-calcs       servo-thread
 addf pid.s.do-pid-calcs       servo-thread
@@ -45,7 +42,7 @@ net both-home-x2     <=  hm2_7i92.0.7i76.0.0.input-02
 # --- BOTH-HOME-Y ---
 net both-home-y     <=  hm2_7i92.0.7i76.0.0.input-03
 
-# --- BOTH-HOME-Z -
+# --- BOTH-HOME-Z ---
 net both-home-z     <=  hm2_7i92.0.7i76.0.0.input-04
 
 #*******************
@@ -283,7 +280,7 @@ net spindle-cw                 <=  spindle.0.forward
 net spindle-ccw                <=  spindle.0.reverse
 net spindle-brake              <=  spindle.0.brake
 net spindle-revs               =>  spindle.0.revs
-net spindle-at-speed           =>  spindle.0.at-speed
+#net spindle-at-speed           =>  spindle.0.at-speed
 net spindle-vel-fb-rps         =>  spindle.0.speed-in
 net spindle-index-enable      <=>  spindle.0.index-enable
 
@@ -293,9 +290,21 @@ setp hm2_7i92.0.7i76.0.0.spinout-scalemax 24000
 setp hm2_7i92.0.7i76.0.0.spinout-maxlim 24000
 setp hm2_7i92.0.7i76.0.0.spinout-minlim 0
 
-sets spindle-at-speed true
+#sets spindle-at-speed true
+
+loadrt timedelay count=1
+addf timedelay.0 servo-thread
+setp timedelay.0.on-delay 10
+setp timedelay.0.off-delay 0
+net spindle-enable => timedelay.0.in
+net spindle-ready <= timedelay.0.out
+net spindle-ready => spindle.0.at-speed
+
+
+
 net spindle-enable hm2_7i92.0.7i76.0.0.spinena
 net spindle-vel-cmd-rpm hm2_7i92.0.7i76.0.0.spinout
+
 
 #******************************
 # connect miscellaneous signals
@@ -350,13 +359,10 @@ net machine-is-enabled        <=  motion.motion-enabled
 
 loadrt estop_latch
 addf estop-latch.0 servo-thread
-
 net estop-loopout iocontrol.0.emc-enable-in <= estop-latch.0.ok-out
 net estop-loopin iocontrol.0.user-enable-out => estop-latch.0.ok-in
 net estop-reset iocontrol.0.user-request-enable => estop-latch.0.reset
 net remote-estop estop-latch.0.fault-in <=  hm2_7i92.0.7i76.0.0.input-00-not
-
-
 
 #  ---manual tool change signals---
 
